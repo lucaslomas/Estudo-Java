@@ -1,6 +1,11 @@
 package model.entites;
 
+import model.exception.HoraError;
 import model.exception.WithdrawError;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Account {
    private int number;
@@ -8,8 +13,7 @@ public class Account {
    private double balance;
    private double withdrawLimit;
 
-   public Account(){
-   }
+   SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
 
    public Account(Integer number, String holder, double balance, double withdrawLimit){
 
@@ -50,7 +54,12 @@ public class Account {
        balance += amount;
     }
 
-    public void withdraw(double amount) {
+    public void withdraw(double amount) throws ParseException {
+       Date now = new Date();
+       Date withdrawTimeLimit = sdf.parse("21:41");
+       if (now.toInstant().isAfter(withdrawTimeLimit.toInstant())){
+           throw new HoraError("Operação fora do horario permitido");
+       }
        if (withdrawLimit < amount){
            throw new WithdrawError("The amount exceeds withdraw limit");
        }
@@ -59,5 +68,4 @@ public class Account {
        }
        balance -= amount;
     }
-
 }
